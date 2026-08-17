@@ -859,7 +859,8 @@ def compute_stringency_index(stringency_values):
     not use iterative approaches like for-loops.
     '''
     """ YOUR CODE HERE """
-    raise NotImplementedError
+    weights = np.array([1, 1, 3, 2])
+    return stringency_values @ weights
     """ YOUR CODE END HERE """
 
 def test_task_2_5():
@@ -973,7 +974,14 @@ def average_increase_in_cases(n_cases_increase, n_adj_entries_avg=7):
     recursion, or any iterative approaches like for-loops.
     '''
     """ YOUR CODE HERE """
-    raise NotImplementedError
+    k = n_adj_entries_avg
+    window_size = 2 * k + 1
+    padded = np.concatenate([np.zeros((n_cases_increase.shape[0], 1)), np.cumsum(n_cases_increase, axis=1)], axis=1)
+    rolling_sum = padded[:, window_size:] - padded[:, :-window_size]
+    avg = np.floor(rolling_sum / window_size)
+    result = np.full(n_cases_increase.shape, np.nan)
+    result[:, k:-k] = avg
+    return result
     """ YOUR CODE END HERE """
 
 def test_task_2_6():
@@ -1080,7 +1088,33 @@ def is_peak(n_cases_increase_avg, n_adj_entries_peak=7):
     recursion, or any iterative approaches like for-loops.
     '''
     """ YOUR CODE HERE """
-    raise NotImplementedError
+    m = n_adj_entries_peak
+    rows, cols = n_cases_increase_avg.shape
+    n_adj_entries_avg = np.count_nonzero(np.isnan(n_cases_increase_avg[0])) // 2
+    d = n_adj_entries_avg + m
+
+    filled = np.where(np.isnan(n_cases_increase_avg), -np.inf, n_cases_increase_avg)
+
+    window_size = 2 * m + 1
+    shape = (rows, cols - window_size + 1, window_size)
+    strides = (filled.strides[0], filled.strides[1], filled.strides[1])
+    windows = np.lib.stride_tricks.as_strided(filled, shape=shape, strides=strides)
+
+    center_values = filled[:, m:cols - m]
+    window_max = np.max(windows, axis=2)
+    left_max = np.max(windows[:, :, :m], axis=2)
+
+    is_first_max = (center_values == window_max) & (center_values > left_max)
+
+    country_means = np.nanmean(n_cases_increase_avg, axis=1, keepdims=True)
+    is_significant = n_cases_increase_avg > 0.1 * country_means
+
+    result = np.full((rows, cols), False)
+    result[:, m:cols - m] = is_first_max
+    result = result & is_significant
+    result[:, :d] = False
+    result[:, -d:] = False
+    return result
     """ YOUR CODE END HERE """
 
 def test_task_2_7():
