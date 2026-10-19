@@ -1,0 +1,25 @@
+% CODE TO GENERATE grad_desc_algorithm.tex
+\documentclass{article}
+\usepackage{algorithm2e}
+\usepackage{bm}
+\pagestyle{empty} % removes page numbers
+\begin{document}
+\RestyleAlgo{ruled}
+\DontPrintSemicolon
+\begin{algorithm}[hbt!]
+    \caption{Gradient Descent for Linear Regression}
+    $w_0, w_1, \ldots, w_d \gets 0$\;
+    \For{$i\gets 1$ \KwTo $T$}{
+        $w'_0 \gets w_0 - \gamma\frac{\partial J(\boldsymbol{w})}{\partial w_0}$\;
+        $w'_1 \gets w_1 - \gamma\frac{\partial J(\boldsymbol{w})}{\partial w_1}$\;
+        $\vdots$\;
+        $w'_d \gets w_d - \gamma\frac{\partial J(\boldsymbol{w})}{\partial w_d}$\;
+        $w_0 \gets w'_0$\;
+        $w_1 \gets w'_1$\;
+        $\vdots$\;
+        $w_d \gets w'_d$\;
+        $loss \gets J(\boldsymbol{w})$\;
+    } 
+\end{algorithm}
+
+\end{document}
